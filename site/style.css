@@ -1,0 +1,90 @@
+/* This css file is included by being imported in index.js */
+
+body {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
+    width: 100%
+}
+
+h1 {
+    font-family: medium-content-sans-serif-font,"Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Arial,sans-serif;
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+.content {
+    width: 700px;
+    margin: auto;
+}
+
+table {
+    margin: auto;
+    left: auto;
+    right: auto;
+    border: 1px solid grey;
+}
+
+tr:nth-child(even) {
+    background-color: #f0f0f0;
+}
+
+td {
+    width: 130px;
+    text-align: right;
+}
+
+th {
+    text-align: center;
+    color: white;
+    background-color: black;
+}
+td:nth-child(1) {
+    text-align: center
+}
+
+
+/* ABHISHEK */
+body {
+  margin: 0;
+  padding: 0;
+}
+.flex-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+}
+div.tabs div {
+  padding: 5px;
+  margin-right: 5px;
+}
+div.tab.active {
+  background-color: #333;
+}
+div.tab a {
+  text-decoration: none;
+  color: #63798B;
+}
+section#task {
+  display: block;
+}
+section#description {
+  display: none;
+}
+.abhishek-content {
+  height: calc(100% - 40px);
+}
+.hidden {
+  display: none;
+}
+.stomp-buttons button {
+  margin-left: 5px;
+}
+#abhishek-sparkline {
+  height: 300px;
+}
+div.tab.active a {
+  color: white;
+}
