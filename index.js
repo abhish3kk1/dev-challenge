@@ -73,28 +73,34 @@ function unSubscribe() {
 
 function displayBids(frame) {
   var bid = JSON.parse(frame.body);
-  let bidExists = false;
-  bids.forEach((b) => {
-    if(b.name==bid.name) {
-      bidExists = true
+  let bidIndex = bids.findIndex((b) => {
+    return b.name == bid.name
+  });
+  if(bidIndex > -1) {
+    for(let prop in bid) {
+      bids[bidIndex][prop] = bid[prop];
     }
-  })
-  if(!bidExists) {
-    console.log(bid)
-    bids.push(bid)
+    bids[bidIndex]['sparks'] = [...bids[bidIndex]['sparks'], (bid.bestBid+bid.bestAsk)/2]
+  } else {
+    bid.sparks = [(bid.bestBid+bid.bestAsk)/2];
+    bids.push(bid);
+  }
+  
+  
+    // bids = [...bids, bid]
     /* The table should be sorted (and remain sorted) by the column that indicates how much the best bid price last changed (lastChangeBid in the response data). */
     /* Ascending/Descending order was not given so, I am assuming ascending order */
-    bids.sort((a,b) => a.lastChangeBid - b.lastChangeBid)
+    bids.sort((a,b) => b.lastChangeBid - a.lastChangeBid)
+
     createHTML()
-  }
+  
 }
 
 function createHTML() {
-  let html = "";
+  let htmlString = "";
   let bidsTbody = document.getElementById("bids-tbody");
   let bidsTable = document.getElementById("bids-table");
-  let sparkline = document.getElementById('abhishek-sparkline')
-  let sparks = []
+  // let sparkline = document.getElementById('abhishek-sparkline')
   let sparkLineOptions = {
     height : null,
     lineColor : "black",
@@ -108,22 +114,23 @@ function createHTML() {
     dotRadius : 4,
   }
   bidsTbody.innerHTML = "";
-  if(bids && bids.length) {
+  if(bids.length) {
     bids.forEach((bid) => {
-      html+="<tr>"+
-              "<td>"+bid.name+"</td>"+
-              "<td>"+bid.bestBid+"</td>"+
-              "<td>"+bid.bestAsk+"</td>"+
-              "<td>"+bid.lastChangeBid+"</td>"+
-              "<td>"+bid.lastChangeAsk+"</td>"+
-            "</tr>";
-      /* The midprice can be calculated by adding the bestBid and bestAsk fields together and dividing by 2. */
-      let midPrice = (bid.bestBid+bid.bestAsk)/2
-      sparks.push(midPrice);
+      htmlString+="<tr>"+
+        "<td>"+bid.name+"</td>"+
+        "<td>"+bid.bestBid+"</td>"+
+        "<td>"+bid.bestAsk+"</td>"+
+        "<td>"+bid.lastChangeBid+"</td>"+
+        "<td>"+bid.lastChangeAsk+"</td>"+
+        "<td id="+bid.name+"></td>"+
+      "</tr>";
     })
-    /* Sparkline should be drawn after/before sorting? I am assuming after */
-    Sparkline.draw(sparkline, sparks, sparkLineOptions)
-    bidsTbody.innerHTML = html;
+    bidsTbody.innerHTML = htmlString
+    Object.keys(bids).forEach((name) => {
+      let bid = bids[name];
+      const sparkline = document.getElementById(bid.name);
+      Sparkline.draw(sparkline, bid.sparks);
+    })
     bidsTable.classList.remove("hidden")
   } else {
     bidsTable.classList.add("hidden")
