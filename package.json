@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./devserver",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -31,5 +31,14 @@
     "typedarray-to-buffer": "^3.1.2",
     "yaeti": "0.0.6",
     "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "@testing-library/dom": "^7.22.2",
+    "@testing-library/jest-dom": "^5.11.3",
+    "babel-jest": "^26.3.0",
+    "babel-polyfill": "^6.26.0",
+    "jest": "^26.4.0"
   }
 }

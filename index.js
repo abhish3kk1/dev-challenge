@@ -40,8 +40,12 @@ var currentTab = 'task';
 var bids = [];
 var subscription = null;
 
+/**
+ * Switches the tab to view
+ * @param {String} tab - The tab which is clicked
+ */
 function changeTab(tab) {
-  var element, divTab
+  let element, divTab
   if(tab !== currentTab) {
     divTab = document.getElementById(currentTab+"-tab");
     divTab.classList.remove('active')
@@ -54,7 +58,10 @@ function changeTab(tab) {
     element.style.display = "block";
   }
 }
-/* request the topic /fx/prices, to receive update messages */
+
+/**
+ * Start Subscription to stomp web socket
+ */
 function subScribe() {
   if(!subscription) {
     subscription = client.subscribe("/fx/prices", displayBids)
@@ -63,16 +70,24 @@ function subScribe() {
   }
 }
 
+/**
+ * Stop Subscription to stomp web socket
+ */
 function unSubscribe() {
   if(subscription) {
     subscription.unsubscribe();
     subscription = null;
-    /* StompVersion error appears for which I was unable to find solution */
   }
 }
 
+/**
+ * Callback function to stomp subscribe function
+ * Checks if bid is present in global variable
+ * Updates bid in bid array
+ * @param {Object} frame - Frame object returned stomp subscribe callback
+ */
 function displayBids(frame) {
-  var bid = JSON.parse(frame.body);
+  let bid = JSON.parse(frame.body);
   let bidIndex = bids.findIndex((b) => {
     return b.name == bid.name
   });
@@ -80,39 +95,27 @@ function displayBids(frame) {
     for(let prop in bid) {
       bids[bidIndex][prop] = bid[prop];
     }
-    bids[bidIndex]['sparks'] = [...bids[bidIndex]['sparks'], (bid.bestBid+bid.bestAsk)/2]
+    console.log(bid.name+' time difference', (Date.now() - bids[bidIndex].time)/1000);
+    if(((Date.now() - bids[bidIndex].time)/1000) >= 30) {
+      bids[bidIndex].time = Date.now();
+      bids[bidIndex]['sparks'] = [...bids[bidIndex]['sparks'], (bid.bestBid+bid.bestAsk)/2]
+    }
   } else {
     bid.sparks = [(bid.bestBid+bid.bestAsk)/2];
+    bid.time = Date.now();
     bids.push(bid);
   }
-  
-  
-    // bids = [...bids, bid]
-    /* The table should be sorted (and remain sorted) by the column that indicates how much the best bid price last changed (lastChangeBid in the response data). */
-    /* Ascending/Descending order was not given so, I am assuming ascending order */
-    bids.sort((a,b) => b.lastChangeBid - a.lastChangeBid)
-
-    createHTML()
-  
+  bids.sort((a,b) => b.lastChangeBid - a.lastChangeBid)
+  createHTML()
 }
 
+/**
+ * process stomp data and create HTML
+ */
 function createHTML() {
   let htmlString = "";
   let bidsTbody = document.getElementById("bids-tbody");
   let bidsTable = document.getElementById("bids-table");
-  // let sparkline = document.getElementById('abhishek-sparkline')
-  let sparkLineOptions = {
-    height : null,
-    lineColor : "black",
-    lineWidth : 2,
-    startColor : "green",
-    endColor : "red",
-    maxColor : "transparent",
-    minColor : "transparent",
-    minValue : null,
-    maxValue : null,
-    dotRadius : 4,
-  }
   bidsTbody.innerHTML = "";
   if(bids.length) {
     bids.forEach((bid) => {
@@ -141,3 +144,9 @@ window.changeTab = changeTab
 window.subScribe = subScribe
 window.unSubscribe = unSubscribe
 window.bids = bids
+
+module.exports = {
+  changeTab,
+  subScribe,
+  unSubscribe
+}
